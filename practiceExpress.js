@@ -14,6 +14,7 @@ app.use(function (req, res, next) {
   console.log("welcome to middleware");
   next();
 });
+app.use(express.static(`${__dirname}/4-natours/starter/public/`));
 
 app.use("/api/v1/tours", tourRoute);
 app.use("/api/v1/users", userRoute);

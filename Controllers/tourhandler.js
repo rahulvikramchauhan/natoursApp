@@ -2,6 +2,24 @@ const fs = require("fs");
 let tour = JSON.parse(
   fs.readFileSync("./4-natours/starter/dev-data/data/tours-simple.json")
 );
+exports.checkId = function (req, res, next, val) {
+  if (val * 1 > tour.length) {
+    return res.status(400).json({
+      status: "failed",
+      message: "can't find id",
+    });
+  }
+  next();
+};
+exports.checkTour = function (req, res, next) {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).send({
+      status: "bad request",
+      message: "name and price not found",
+    });
+  }
+  next();
+};
 
 exports.getAllTours = function (req, res) {
   console.log(req.exactTime);
