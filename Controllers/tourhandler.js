@@ -1,25 +1,24 @@
 const fs = require("fs");
-let tour = JSON.parse(
-  fs.readFileSync("./4-natours/starter/dev-data/data/tours-simple.json")
-);
-exports.checkId = function (req, res, next, val) {
-  if (val * 1 > tour.length) {
-    return res.status(400).json({
-      status: "failed",
-      message: "can't find id",
-    });
-  }
-  next();
-};
-exports.checkTour = function (req, res, next) {
-  if (!req.body.name || !req.body.price) {
-    return res.status(400).send({
-      status: "bad request",
-      message: "name and price not found",
-    });
-  }
-  next();
-};
+const tour=require("../Database/mongodb");
+
+// exports.checkId = function (req, res, next, val) {
+//   if (val * 1 > tour.length) {
+//     return res.status(400).json({
+//       status: "failed",
+//       message: "can't find id",
+//     });
+//   }
+//   next();
+// };
+// exports.checkTour = function (req, res, next) {
+//   if (!req.body.name || !req.body.price) {
+//     return res.status(400).send({
+//       status: "bad request",
+//       message: "name and price not found",
+//     });
+//   }
+//   next();
+// };
 
 exports.getAllTours = function (req, res) {
   console.log(req.exactTime);
@@ -32,18 +31,16 @@ exports.getTour = function (req, res) {
   });
   res.status(200).json({ status: "success", data: tour });
 };
-exports.createNewTour = function (req, res) {
-  console.log(req.body);
-  const newId = tour[tour.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
-  tour.push(newTour);
-  fs.writeFile(
-    "./4-natours/starter/dev-data/data/tours-simple.json",
-    JSON.stringify(tour),
-    function (err) {
-      res.status(201).json({ status: "success", data: newTour });
-    }
-  );
+
+exports.createNewTour = async function (req, res) {
+  try{
+    const newTour=await tour.create(req.body);
+ res.status(200).json({status:"success",
+data:newTour});
+  }catch(err){
+    res.status(400).json({status:"fail",message:"bad request"});
+  }
+  
   // res.end();
 };
 exports.updateTour = function (req, res) {

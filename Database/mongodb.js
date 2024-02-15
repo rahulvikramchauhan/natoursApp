@@ -13,7 +13,4 @@ const userSchema = new mongoose.Schema({
 
 const Tours = mongoose.model("tours", userSchema);
 
-exports.newTour = new Tours({
-  firstName: "darcy",
-  lastName: "vikram chauhan",
-});
+module.exports=Tours;

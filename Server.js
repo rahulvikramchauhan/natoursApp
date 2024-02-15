@@ -1,13 +1,10 @@
 const dotenv = require("dotenv");
 const app = require("./practiceExpress");
 const mongoose = require("mongoose");
-const { newTour } = require("./Database/mongodb");
+// const { newTour } = require("./Database/mongodb");
 dotenv.config({ path: "./config.env" });
 
-(async function () {
-  const data = await newTour.save();
-  console.log(data);
-})();
+
 
 mongoose
   .connect(process.env.MONGODB_CONNECTION_STRING + "NewNatours_app")
