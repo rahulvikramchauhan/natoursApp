@@ -1,5 +1,6 @@
 const fs = require("fs");
-const tour=require("../Database/mongodb");
+const tours=require("../Database/mongodb");
+const tourData=JSON.parse(fs.readFileSync("./Data/tours-simple.json","utf-8"))
 
 // exports.checkId = function (req, res, next, val) {
 //   if (val * 1 > tour.length) {
@@ -20,42 +21,60 @@ const tour=require("../Database/mongodb");
 //   next();
 // };
 
-exports.getAllTours = function (req, res) {
-  console.log(req.exactTime);
-  res.status(200).json({ status: "success", result: tour.length, data: tour });
+exports.getAllTours = async function (req, res) {
+  console.log(req.query);
+  const queryObj={...req.query};
+  let query=tours.find({});
+  query=query.sort(req.query.sort)
+  query=await query;
+  
+  
+  res.status(200).json({ status: "success",data:query });
 };
 exports.getTour = function (req, res) {
-  const id = req.params.id * 1;
-  tour = tour.filter(function (el) {
-    return el.id == id;
-  });
+  // const id = req.params.id * 1;
+  // tour = tour.filter(function (el) {
+  //   return el.id == id;
+  // });
   res.status(200).json({ status: "success", data: tour });
 };
 
 exports.createNewTour = async function (req, res) {
   try{
-    const newTour=await tour.create(req.body);
+    console.log(typeof tourData[0].name);
+    const newTour=await tours.insertMany(tourData);;
  res.status(200).json({status:"success",
 data:newTour});
   }catch(err){
-    res.status(400).json({status:"fail",message:"bad request"});
+    res.status(400).json({status:"fail",message:err});
   }
   
   // res.end();
 };
-exports.updateTour = function (req, res) {
+exports.updateTour =async function (req, res) {
   // console.log(req.body);
-  tour = tour.map(function (el) {
-    if (el.id === req.params.id * 1) {
-      el.name = req.body.name;
-    }
-    return el;
-  });
-  fs.writeFile("./rahul/rahul.txt", JSON.stringify(tour), function (err) {
-    if (err) {
-      res.status(401).json({ status: "failed", data: err });
-    } else {
-      res.status(200).json({ status: "source updated", data: req.body });
-    }
-  });
+  try{
+    const tour= await tours.findByIdAndUpdate(req.params.id,req.body,{
+      new:true,
+      runValidators:true,
+    });
+    res.status(200).json({
+      status:"pass",
+      data:tour
+    })
+
+  }catch(err){
+    res.status(400).json({status:"fail",message:err});
+  }
 };
+exports.deleteTourbyId=async function(req,res){
+  try {
+    const tour=await tours.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      status:"pass",
+      data:tour
+    });
+  } catch (error) {
+    res.status(400).json({status:"fail",message:error});
+  }
+}
