@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     type:String,
   },
   ratingsAverage:{
-    type:String,
+    type:Number,
     default:4.5,
   },
   ratingQuantity:{
@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
     trim:true,
     required:[true,"A tour must have summary"]
   },
-  discription:{
+  description:{
     type:String,
     trim:true,
   },
@@ -50,6 +50,7 @@ const userSchema = new mongoose.Schema({
   createdAt:{
     type:Date,
     default:Date.now,
+    select:false
   },
   StartDate:[Date]
 });
