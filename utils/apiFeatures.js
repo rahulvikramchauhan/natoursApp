@@ -1,3 +1,4 @@
+const tours=require("../Database/mongodb");
 class ApiFeatures{
     constructor(moongooseQuery,expressQuery){
       // moongooseQuery=tours.find
@@ -19,9 +20,9 @@ class ApiFeatures{
       return `$${matchValue}`
     })
     queryObj=JSON.parse(queryString);
-    console.log(queryObj);
+    console.log("queryObj");
   
-    this.moongooseQuery=this.moongooseQuery.find(queryObj);
+    this.moongooseQuery=this.moongooseQuery.find({},{"name":1});
       return this;
     }
     sort(){
@@ -45,5 +46,6 @@ class ApiFeatures{
       }
       return this;
     }
+   
   }
 module.exports=ApiFeatures;
