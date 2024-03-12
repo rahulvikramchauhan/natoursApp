@@ -18,6 +18,13 @@ const userSchema = new mongoose.Schema({
   },
   duration: {
     type: Number,
+    validate:{
+      validator:function(val){
+       
+        return val>0?true:false;
+      },
+      message:"duration {VALUE} must greater than 0"
+    }
   },
   difficulty:{
     type:String,
@@ -52,8 +59,22 @@ const userSchema = new mongoose.Schema({
     default:Date.now,
     select:false
   },
-  StartDate:[Date]
+  startDates:[Date]
+},{
+  toJSON:{virtuals:false,transform: function(doc, ret) {
+    // Remove the duplicate _id field
+    delete ret.id;
+  }},
+  toObject:{virtuals:false,transform: function(doc, ret) {
+    // Remove the duplicate _id field
+    delete ret.id;
+  }},
+  
 });
+
+userSchema.virtual('durationWeeks').get(function(){
+  return this.duration / 7;
+})
 
 const Tours = mongoose.model("tours", userSchema);
 

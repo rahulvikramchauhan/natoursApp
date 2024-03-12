@@ -1,7 +1,8 @@
 const fs = require("fs");
 const tours=require("../Database/mongodb");
 const tourData=JSON.parse(fs.readFileSync("./Data/tours-simple.json","utf-8"))
-const ApiFeatures=require("../utils/apiFeatures")
+const ApiFeatures=require("../utils/apiFeatures");
+
 
 
 // exports.checkId = function (req, res, next, val) {
@@ -82,8 +83,10 @@ exports.getAllTours = async function (req, res) {
 
   // B) EXECUTE QUERY
   let features=new ApiFeatures(tours.find(),req.query);
-  console.log(features);
-  features.sort().pagination().feilds();
+  
+  features.filter().sort().feilds().pagination();
+  // console.log(features.moongooseQuery)
+  
   let query=await features.moongooseQuery;
   
   
@@ -115,7 +118,7 @@ data:newTour});
 exports.updateTour =async function (req, res) {
   // console.log(req.body);
   try{
-    const tour= await tours.findByIdAndUpdate(req.params._id,req.body,{
+    const tour= await tours.findByIdAndUpdate(req.params.id,req.body,{
       new:true,
       runValidators:true,
     });
@@ -137,5 +140,48 @@ exports.deleteTourbyId=async function(req,res){
     });
   } catch (error) {
     res.status(400).json({status:"fail",message:error});
+  }
+}
+exports.getMonthlyStas=async function(req,res){
+  try {
+    const year=req.params.year||2020;
+    const date=new Date(Date.now());
+    const query=await tours.aggregate([
+      {
+        $addFields:{welcome:"home"}
+      }
+      // {
+      //   $unwind:{
+      //     path:"$startDates"
+      //   }
+      // },
+      // {
+      //   $match:{
+      //     "startDates":{
+      //       $gte:new Date(`${year}-01-01`),
+      //       $lte:new Date(`${year}-12-31`)
+      //     },
+      //   }
+      // },
+      // {
+      //   $group:{
+      //     _id:{$month:"$startDates"},
+      //     total_Count: { $sum: 1 }, // Count the number of documents
+      //     avg_price: { $avg: "$price" },
+      //     tour:{$push:"$name"},
+      //     max_price:{$max:"$price"},
+      //     min_price:{$min:"$price"}
+
+      //     // round_avg_price: { $round: ["$avg_price", 2] }
+      //        }
+      // },{
+      //   $addFields:
+      //   {createdDates:date.toLocaleString()}
+      // }
+      
+    ])
+    res.status(200).json({ status: "success",results:query.length,data:query });
+  } catch (error) {
+    res.status(404).json({status:"fail",message:error})
   }
 }
