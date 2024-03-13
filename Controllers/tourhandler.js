@@ -1,6 +1,7 @@
 const fs = require("fs");
 const tours=require("../Database/mongodb");
 const tourData=JSON.parse(fs.readFileSync("./Data/tours-simple.json","utf-8"))
+const catchAsync=require("../utils/catchAsync")
 const ApiFeatures=require("../utils/apiFeatures");
 
 
@@ -30,58 +31,7 @@ exports.getbesttour=async function(req,res,next){
   next();
 }
 
-exports.getAllTours = async function (req, res) {
-  try {
-
-  // // A) BUILD QUERY
-  // // A1)FILTERRING
-  // console.log(req.query)
-  // let queryObj={...req.query};
-  // const exculdeFilter=["sort","limit","page","feilds"];
-  // exculdeFilter.forEach(function(el){
-  //   delete queryObj[el];
-  // })
-  // // let query=tours.find().where("duration").equals(4).where("ratingsAverage").equals("4.4");
-
-  // // A2)ADVANCE FILTERRING
-
-  // let queryString=JSON.stringify(queryObj).replace(/\b(gte|gt|lte|lt)\b/g,function(matchValue){
-  //   return `$${matchValue}`
-  // })
-  // queryObj=JSON.parse(queryString);
-  // console.log(queryObj);
-
-  // let query=tours.find(queryObj);
-  // A3) SORTING
-  // if(req.query.sort){
-  //   query=query.sort(req.query.sort)
-  // }
-
-  // // A4)PAGINATION
-  // let limit=req.query.limit*1||100;
-  // let skip=req.query.page*1||1
-  // let toSkip=(skip-1)*(limit);
-  // query.skip(toSkip).limit(limit) ;
-
-  // if(req.query.page){
-  //   let countDocument=await tours.countDocuments();
-  //   if(toskip>countDocument){
-  //     throw new Error("page not found")
-  //   } 
-
-  // }
-
- 
-
-  // // A5)PROJECTION
-  // if(req.query.feilds){
-  //   let feilds=req.query.feilds.split(",").join(" ");
-  //   query.select(feilds)
-  // }
-
-  
-
-  // B) EXECUTE QUERY
+exports.getAllTours = catchAsync(async function (req, res,next) {
   let features=new ApiFeatures(tours.find(),req.query);
   
   features.filter().sort().feilds().pagination();
@@ -91,11 +41,66 @@ exports.getAllTours = async function (req, res) {
   
   
   res.status(200).json({ status: "success",results:query.length,data:query });
-  } catch (error) {
-    res.status(404).json({status:"fail",message:error})
-  }
+});
+  // try {
+
+  // // // A) BUILD QUERY
+  // // // A1)FILTERRING
+  // // console.log(req.query)
+  // // let queryObj={...req.query};
+  // // const exculdeFilter=["sort","limit","page","feilds"];
+  // // exculdeFilter.forEach(function(el){
+  // //   delete queryObj[el];
+  // // })
+  // // // let query=tours.find().where("duration").equals(4).where("ratingsAverage").equals("4.4");
+
+  // // // A2)ADVANCE FILTERRING
+
+  // // let queryString=JSON.stringify(queryObj).replace(/\b(gte|gt|lte|lt)\b/g,function(matchValue){
+  // //   return `$${matchValue}`
+  // // })
+  // // queryObj=JSON.parse(queryString);
+  // // console.log(queryObj);
+
+  // // let query=tours.find(queryObj);
+  // // A3) SORTING
+  // // if(req.query.sort){
+  // //   query=query.sort(req.query.sort)
+  // // }
+
+  // // // A4)PAGINATION
+  // // let limit=req.query.limit*1||100;
+  // // let skip=req.query.page*1||1
+  // // let toSkip=(skip-1)*(limit);
+  // // query.skip(toSkip).limit(limit) ;
+
+  // // if(req.query.page){
+  // //   let countDocument=await tours.countDocuments();
+  // //   if(toskip>countDocument){
+  // //     throw new Error("page not found")
+  // //   } 
+
+  // // }
+
+ 
+
+  // // // A5)PROJECTION
+  // // if(req.query.feilds){
+  // //   let feilds=req.query.feilds.split(",").join(" ");
+  // //   query.select(feilds)
+  // // }
+
   
-};
+
+  // // B) EXECUTE QUERY
+  
+  // }
+  //  catch (error) {
+  //   console.log(error.message)
+  //   res.status(404).json({status:"fail",message:error.message})
+  // }
+  
+
 exports.getTour =async function (req, res) {
   const id = req.params.id ;
   console.log(req.params);
@@ -147,37 +152,35 @@ exports.getMonthlyStas=async function(req,res){
     const year=req.params.year||2020;
     const date=new Date(Date.now());
     const query=await tours.aggregate([
+      
       {
-        $addFields:{welcome:"home"}
+        $unwind:{
+          path:"$startDates"
+        }
+      },
+      {
+        $match:{
+          "startDates":{
+            $gte:new Date(`${year}-01-01`),
+            $lte:new Date(`${year}-12-31`)
+          },
+        }
+      },
+      {
+        $group:{
+          _id:{$month:"$startDates"},
+          total_Count: { $sum: 1 }, // Count the number of documents
+          avg_price: { $avg: "$price" },
+          tour:{$push:"$name"},
+          max_price:{$max:"$price"},
+          min_price:{$min:"$price"}
+             }
+      },{
+        $addFields:
+        {createdDates:date.toLocaleString(),
+          roundAvgPrice: { $round: ["$avg_price"] }
+        }
       }
-      // {
-      //   $unwind:{
-      //     path:"$startDates"
-      //   }
-      // },
-      // {
-      //   $match:{
-      //     "startDates":{
-      //       $gte:new Date(`${year}-01-01`),
-      //       $lte:new Date(`${year}-12-31`)
-      //     },
-      //   }
-      // },
-      // {
-      //   $group:{
-      //     _id:{$month:"$startDates"},
-      //     total_Count: { $sum: 1 }, // Count the number of documents
-      //     avg_price: { $avg: "$price" },
-      //     tour:{$push:"$name"},
-      //     max_price:{$max:"$price"},
-      //     min_price:{$min:"$price"}
-
-      //     // round_avg_price: { $round: ["$avg_price", 2] }
-      //        }
-      // },{
-      //   $addFields:
-      //   {createdDates:date.toLocaleString()}
-      // }
       
     ])
     res.status(200).json({ status: "success",results:query.length,data:query });
@@ -185,3 +188,4 @@ exports.getMonthlyStas=async function(req,res){
     res.status(404).json({status:"fail",message:error})
   }
 }
+
