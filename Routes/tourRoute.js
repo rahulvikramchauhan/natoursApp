@@ -5,7 +5,7 @@ const router = express.Router();
 // router.param("id", tourhandler.checkId);
 router.get("/getMonthlyStas/:year",tourhandler.getMonthlyStas);
 router.get("/getMonthlyStas",tourhandler.getMonthlyStas);
-router.get("/top-5-tours",tourhandler.getbesttour,tourhandler.getAllTours)
+router.get("/top-5-tours",tourhandler.getbestTour,tourhandler.getAllTours)
 
 router
   .route("/")

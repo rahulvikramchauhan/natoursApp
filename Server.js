@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+dotenv.config({ path: "./config.env" });
 const app = require("./practiceExpress");
 const mongoose = require("mongoose");
 // const { newTour } = require("./Database/mongodb");
