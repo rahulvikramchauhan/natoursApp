@@ -1,4 +1,4 @@
-const tours=require("../Database/tourModel");
+const tours=require("../Database/mongodb");
 class ApiFeatures{
     constructor(moongooseQuery,expressQuery){
       // moongooseQuery=tours.find

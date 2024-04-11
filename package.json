@@ -4,22 +4,18 @@
   "description": "practicing backend",
   "main": "practiceExpress.js",
   "scripts": {
-    "start": "node Server.js",
-    "start:prod": "NODE_ENV=production nodemon Server.js"
+    "start": "node Server.js"
   },
   "author": "rahul_chauhan",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
     "express-session": "^1.18.0",
-    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.3.0",
     "mongoose": "^8.1.1",
     "morgan": "^1.10.0",
-    "nodemon": "^3.0.3",
-    "validator": "^13.11.0"
+    "nodemon": "^3.0.3"
   }
 }
