@@ -21,6 +21,11 @@ const userSchema=new moongoose.Schema({
             message:"please provide corrent email"
         }
     },
+    role:{
+        type:String,
+        enum:["admin","guide","lead-guide",],
+        default:"user"
+    },
     password:{
         type:String,
         required:[true, "need to provide password"],
