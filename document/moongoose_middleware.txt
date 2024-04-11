@@ -1,0 +1,22 @@
+exports.updateTour =catchAsync(async function (req, res,next) {
+  // console.log(req.body);
+  
+    const tour= await tours.findByIdAndUpdate(req.params.id,req.body,{
+      new:true,
+      runValidators:true,
+    });
+    res.status(200).json({
+      status:"pass",
+      data:tour
+    })
+
+  
+});
+tourSchema.pre(/^find/, function(next) {
+  this.find({ secretTour: { $ne: true } });
+
+  this.start = Date.now();
+  next();
+});
+model.findById: it find data from particular collection(model);
+this.find:- it set up extra condition on the findByIdAndUpdate with already given condition
