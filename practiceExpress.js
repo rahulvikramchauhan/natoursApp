@@ -6,6 +6,7 @@ const globalErrorHandler=require("./Controllers/errorHandler")
 const tourRoute = require("./Routes/tourRoute");
 const userRoute = require("./Routes/userRoute");
 const app = express();
+const auth=require("./Controllers/authenticationHandler")
 
 //middleware
 app.use(express.json());
@@ -14,11 +15,12 @@ app.use(morgan("dev"));
 app.use(function (req, res, next) {
   req.exactTime = new Date().toISOString();
   console.log("welcome to middleware");
+ 
   next();
 });
 app.use(express.static(`${__dirname}/4-natours/starter/public/`));
 
-app.use("/api/v1/tours", tourRoute);
+app.use("/api/v1/tours",auth.protectRoute, tourRoute);
 app.use("/api/v1/users", userRoute);
 
 
@@ -34,7 +36,7 @@ app.all("*",function(req,res,next){
 
   next(new AppError(404,`can't find ${req.originalUrl} in server`))
 });
-app.use(globalErrorHandler)
+app.use(globalErrorHandler)// only used error
 
 // app.get("/api/v1/tours", getAllTours);
 // app.get("/api/v1/tours/:id", getTour);
