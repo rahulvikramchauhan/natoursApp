@@ -1,2 +1,4 @@
 /4-natours
 /node_modules
+/config.env
+/.gitignore
