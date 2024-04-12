@@ -3,6 +3,7 @@ const tours=require("../Database/tourModel");
 const tourData=JSON.parse(fs.readFileSync("./Data/tours-simple.json","utf-8"))
 const ApiFeatures=require("../utils/apiFeatures");
 const AppError = require("../utils/AppError");
+const catchAsync = require("../utils/catchAsync");
 
 
 
