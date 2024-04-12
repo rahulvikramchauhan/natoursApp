@@ -1,20 +1,12 @@
 const mongoose = require("mongoose");
 
-
+console.log("schema called")
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     unique: true,
-    required: [true, "Need to provide fname"],
-    validate: {
-      validator: function(v) {
-        console.log(typeof v);
-        return typeof v=='string';
-      },
-      message: props => `${props.value} is not a valid String!`
-    }
-    
+    required: [true,"required fname"],
   },
   duration: {
     type: Number,
@@ -28,10 +20,22 @@ const userSchema = new mongoose.Schema({
   },
   difficulty:{
     type:String,
+    enum:{
+    values:["easy","difficult","medium"],
+    message:" Difficulty is either: easy, medium, difficult"
+    }
+
+    
   },
   ratingsAverage:{
     type:Number,
     default:4.5,
+    validate:{
+      validator: function(val){
+        return val<5 && val>0
+      },
+      message:"rating avg {VALUE} must less than 5 and greater than 0"
+    }
   },
   ratingQuantity:{
     type:Number,
@@ -39,10 +43,12 @@ const userSchema = new mongoose.Schema({
   },
   price:{
     type:Number,
+    unique:true
   },
   summary:{
     type:String,
     trim:true,
+    unique:true,
     required:[true,"A tour must have summary"]
   },
   description:{

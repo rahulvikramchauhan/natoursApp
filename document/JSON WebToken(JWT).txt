@@ -1,0 +1,14 @@
+JWT(JSON Web Token):
+
+
+
+
+
+
+
+
+
+when sending JWT token in header, their is standard way:
+
+key_name:Authorization
+key_value: Bearer {token}
