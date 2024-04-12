@@ -102,7 +102,7 @@ exports.getTour =async function (req, res) {
   const id = req.params.id ;
   console.log(req.params);
    
-  tour = await tours.findById(req.params.id);
+  let tour = await tours.findById(req.params.id);
  
   if(!tour){
     
